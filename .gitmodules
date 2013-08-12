@@ -1,3 +1,6 @@
 [submodule "govuk_template_play"]
 	path = govuk_template_play
 	url = git@github.com:michaeldfallen/govuk_template_play.git
+[submodule "govuk_template"]
+	path = govuk_template
+	url = git@github.com:alphagov/govuk_template.git
