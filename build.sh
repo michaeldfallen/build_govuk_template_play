@@ -13,6 +13,7 @@ cd $templateDir
 #now in ./govuk_template
 echo "Updating govuk_template submodule"
 git pull -q
+rm -rf $pkgDir
 
 echo "Compiling govuk_template for play using build:play"
 bundle exec rake build:play
@@ -24,21 +25,20 @@ cp -r play_govuk_template-*/* .
 version="$(ls $pkgDir | grep play | grep -Eo "\d.\d.\d" )"
 rm -rf play_govuk_template-*
 
-if [[ -n "$(git tag | grep -o $version)" ]]; then
-  echo ""
-  echo "Tag already exists, reverting."
-  git reset --hard HEAD
-  echo "Bump the version number then run build again."	
-else 
-	git add -A .
-	git commit -q -m "deploying Govuk Play templates $version"
-	git tag -a v$version -m "deploying $version"
-	git push --tags
+echo "Version $version compiled. Should I deploy?"
+read deploy
 
-	echo "Finished. Should I push?"
-	read pushit
-
-	if [[ "$pushit" == y* ]] || [[ "$pushit" == Y* ]]; then 
-		git push 
-	fi
+if [[ "$deploy" == y* ]] || [[ "$deploy" == Y* ]]; then
+  if [[ -n "$(git tag | grep -o $version)" ]]; then
+    echo ""
+    echo "Tag already exists, reverting."
+    git reset --hard HEAD
+    echo "Bump the version number then run build again."	
+  else 
+  	git add -A .
+  	git commit -q -m "deploying Govuk Play templates $version"
+  	git tag -af v$version -m "deploying $version"
+  	git push 
+    git push --tags 
+  fi
 fi
